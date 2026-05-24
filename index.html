@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AZY GPT</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: white; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        header { padding: 20px; text-align: center; color: #58a6ff; font-size: 26px; font-weight: bold; border-bottom: 1px solid #30363d; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        footer { padding: 15px; display: flex; background: #161b22; border-top: 1px solid #30363d; gap: 10px; }
+        input { flex: 1; padding: 12px 20px; border-radius: 25px; border: 1px solid #30363d; background: #0d1117; color: white; outline: none; }
+        button { background: #238636; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; color: white; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #2ea043; }
+        .msg { padding: 12px 18px; border-radius: 20px; max-width: 80%; line-height: 1.4; }
+        .user { background: #1f6feb; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .bot { background: #30363d; align-self: flex-end; border-bottom-right-radius: 2px; border: 1px solid #58a6ff; }
+    </style>
+</head>
+<body>
+    <header>AZY GPT</header>
+    <div id="chat">
+        <div class="msg bot">مرحباً يا Yzn! أنا AZY GPT، محرك الذكاء الاصطناعي الخاص بك جاهز للعمل.</div>
+    </div>
+    <footer>
+        <input type="text" id="input" placeholder="اكتب سؤالك هنا...">
+        <button onclick="send()">إرسال</button>
+    </footer>
+
+    <script>
+        const key = "AIzaSyDO-6NUtbVFPlzU8CZmZPLDOxvq4tAV5v8"; // مفتاحك الجديد المدمج
+        async function send() {
+            const inp = document.getElementById('input');
+            const chat = document.getElementById('chat');
+            const text = inp.value.trim();
+            if(!text) return;
+
+            chat.innerHTML += `<div class="msg user">${text}</div>`;
+            inp.value = "";
+            chat.scrollTop = chat.scrollHeight;
+
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({contents: [{parts: [{text: text}]}]})
+                });
+                const data = await res.json();
+                const reply = data.candidates[0].content.parts[0].text;
+                chat.innerHTML += `<div class="msg bot"><b>AZY GPT:</b><br>${reply}</div>`;
+            } catch(e) {
+                chat.innerHTML += `<div class="msg bot" style="color: #f85149;">حدث خطأ في الاتصال. تأكد من صلاحية المفتاح.</div>`;
+            }
+            chat.scrollTop = chat.scrollHeight;
+        }
+    </script>
+</body>
+</html>
